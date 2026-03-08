@@ -1,15 +1,16 @@
 import { useMemo } from "react";
+import { motion } from "framer-motion";
 
 const ParticleField = () => {
   const particles = useMemo(
     () =>
-      Array.from({ length: 30 }, (_, i) => ({
+      Array.from({ length: 40 }, (_, i) => ({
         id: i,
         left: Math.random() * 100,
         size: Math.random() * 3 + 1,
         delay: Math.random() * 15,
-        duration: Math.random() * 10 + 12,
-        opacity: Math.random() * 0.4 + 0.1,
+        duration: Math.random() * 10 + 14,
+        opacity: Math.random() * 0.3 + 0.05,
       })),
     []
   );
@@ -26,12 +27,28 @@ const ParticleField = () => {
             height: `${p.size}px`,
             opacity: p.opacity,
             animation: `particle-drift ${p.duration}s linear ${p.delay}s infinite`,
+            boxShadow: p.size > 2 ? `0 0 ${p.size * 2}px hsl(var(--gold) / 0.3)` : "none",
           }}
         />
       ))}
       {/* Ambient gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/5 blur-3xl animate-pulse-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-primary/3 blur-3xl animate-pulse-glow" style={{ animationDelay: "2s" }} />
+      <motion.div
+        animate={{ scale: [1, 1.1, 1], opacity: [0.03, 0.06, 0.03] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-primary blur-[120px]"
+      />
+      <motion.div
+        animate={{ scale: [1, 1.15, 1], opacity: [0.02, 0.04, 0.02] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-primary blur-[100px]"
+      />
+      {/* Subtle vignette */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at center, transparent 50%, hsl(var(--background)) 100%)",
+        }}
+      />
     </div>
   );
 };

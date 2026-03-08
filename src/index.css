@@ -90,15 +90,112 @@
     @apply bg-glass/40 backdrop-blur-xl border border-glass-border/30 rounded-2xl;
   }
 
+  .glass-panel-elevated {
+    @apply bg-glass/50 backdrop-blur-2xl border border-glass-border/40 rounded-2xl;
+    box-shadow: 
+      0 8px 32px hsl(var(--deep-blue) / 0.4),
+      0 0 0 1px hsl(var(--gold) / 0.05),
+      inset 0 1px 0 hsl(var(--soft-white) / 0.05);
+  }
+
   .gold-glow {
     box-shadow: 0 0 40px hsl(var(--gold) / 0.15), 0 0 80px hsl(var(--gold) / 0.05);
+  }
+
+  .gold-glow-strong {
+    box-shadow: 
+      0 0 30px hsl(var(--gold) / 0.25), 
+      0 0 60px hsl(var(--gold) / 0.1),
+      0 0 120px hsl(var(--gold) / 0.05);
   }
 
   .gold-text-glow {
     text-shadow: 0 0 30px hsl(var(--gold) / 0.3);
   }
 
+  .gold-text-glow-strong {
+    text-shadow: 
+      0 0 20px hsl(var(--gold) / 0.4),
+      0 0 60px hsl(var(--gold) / 0.2);
+  }
+
   .ambient-glow {
     box-shadow: 0 0 100px 20px hsl(var(--gold) / 0.08), 0 0 200px 40px hsl(222 47% 20% / 0.3);
   }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--gold) / 0.06) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  .premium-border {
+    border-image: linear-gradient(
+      135deg,
+      hsl(var(--gold) / 0.3),
+      hsl(var(--glass-border) / 0.3),
+      hsl(var(--gold) / 0.15)
+    ) 1;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--gold-light)), hsl(var(--gold)), hsl(var(--gold-light)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-gradient-radial-gold {
+    background: radial-gradient(
+      ellipse at center,
+      hsl(var(--gold) / 0.08) 0%,
+      transparent 70%
+    );
+  }
+
+  .btn-premium {
+    @apply relative overflow-hidden;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--gold) / 0.9),
+      hsl(var(--gold-glow)),
+      hsl(var(--gold) / 0.9)
+    );
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  .btn-premium::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--soft-white) / 0.15) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.8; }
 }
