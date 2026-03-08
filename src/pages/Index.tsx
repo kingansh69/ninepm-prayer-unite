@@ -29,7 +29,7 @@ const Index = () => {
       if (user.onboardingComplete) {
         setScreen("main");
         if (user.selectedLanguage) {
-          const lang = getLang(user.selectedLanguage);
+          const lang = getLanguageByCode(user.selectedLanguage);
           if (lang) setSelectedLanguage(lang);
         }
       } else {
