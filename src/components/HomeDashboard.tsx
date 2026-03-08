@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { Play, Bell, Share2, Globe, BellOff } from "lucide-react";
+import { Play, Bell, Share2, Globe, BellOff, Check, Flame, Calendar } from "lucide-react";
 import CountdownTimer from "./CountdownTimer";
-import { getUser, updateUser } from "@/lib/storage";
+import { getUser, updateUser, prayedToday, prayedYesterday, getPrayerStreak } from "@/lib/storage";
 import { getLanguageByCode } from "@/lib/languages";
 import { useState, useEffect } from "react";
 
@@ -16,6 +16,10 @@ const HomeDashboard = ({ onPlayPrayer, onSelectLanguage, onShare }: HomeDashboar
   const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? false);
   const selectedLang = user?.selectedLanguage ? getLanguageByCode(user.selectedLanguage) : null;
   const [isPrayerTime, setIsPrayerTime] = useState(false);
+
+  const didPrayToday = prayedToday();
+  const didPrayYesterday = prayedYesterday();
+  const streak = getPrayerStreak();
 
   useEffect(() => {
     const check = () => {
@@ -35,7 +39,6 @@ const HomeDashboard = ({ onPlayPrayer, onSelectLanguage, onShare }: HomeDashboar
       if (perm === "granted") {
         setReminderEnabled(true);
         updateUser({ reminderEnabled: true });
-        // Vibrate on enable
         if (navigator.vibrate) navigator.vibrate(50);
       }
     } else {
@@ -69,8 +72,42 @@ const HomeDashboard = ({ onPlayPrayer, onSelectLanguage, onShare }: HomeDashboar
       </motion.div>
 
       {/* Countdown */}
-      <motion.div variants={item} className="flex justify-center mb-8">
+      <motion.div variants={item} className="flex justify-center mb-6">
         <CountdownTimer />
+      </motion.div>
+
+      {/* Prayer History Card */}
+      <motion.div variants={item} className="glass-panel p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {didPrayToday ? (
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Check className="w-4 h-4 text-primary" />
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                </div>
+              )}
+              <div>
+                <p className="text-sm text-foreground">
+                  {didPrayToday ? "Prayed tonight ✓" : "Not yet prayed today"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {didPrayYesterday ? "Prayed yesterday ✓" : "Missed yesterday"}
+                </p>
+              </div>
+            </div>
+          </div>
+          {streak > 0 && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+              <Flame className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">{streak}</span>
+              <span className="text-xs text-muted-foreground">day{streak !== 1 ? "s" : ""}</span>
+            </div>
+          )}
+        </div>
       </motion.div>
 
       {/* Hero Play Card */}
@@ -92,7 +129,7 @@ const HomeDashboard = ({ onPlayPrayer, onSelectLanguage, onShare }: HomeDashboar
           </div>
           <div className="text-left flex-1">
             <p className="text-lg font-display text-foreground">
-              {isPrayerTime ? "Join Prayer Now" : "Tonight's Prayer"}
+              {isPrayerTime ? "Join Prayer Now" : didPrayToday ? "Pray Again" : "Tonight's Prayer"}
             </p>
             <p className="text-sm text-muted-foreground mt-0.5">
               {selectedLang

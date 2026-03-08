@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Share2, Maximize2, Captions, Check, Bell } from "lucide-react";
+import { ArrowLeft, Share2, Maximize2, Captions, Check } from "lucide-react";
 import type { Language } from "@/lib/languages";
 import { useState, useEffect } from "react";
-import { updateUser, getUser } from "@/lib/storage";
+import { recordPrayer, getUser, updateUser, getPrayerStreak } from "@/lib/storage";
 
 interface VideoPlayerProps {
   language: Language;
@@ -13,22 +13,12 @@ const VideoPlayer = ({ language, onBack }: VideoPlayerProps) => {
   const [subtitles, setSubtitles] = useState(true);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
-  const [ambientPulse, setAmbientPulse] = useState(true);
-
-  useEffect(() => {
-    // Mark prayer as watched
-    const timer = setTimeout(() => {
-      updateUser({ lastPrayerDate: new Date().toISOString() });
-    }, 30000); // After 30 seconds
-    return () => clearTimeout(timer);
-  }, []);
+  const [ambientPulse] = useState(true);
+  const [showParticles, setShowParticles] = useState(false);
 
   useEffect(() => {
     // Vibrate gently when prayer starts
-    if (navigator.vibrate) {
-      navigator.vibrate([50, 100, 50]);
-    }
-    // Simulate loading
+    if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
     const t = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(t);
   }, []);
@@ -52,10 +42,14 @@ const VideoPlayer = ({ language, onBack }: VideoPlayerProps) => {
 
   const handleComplete = () => {
     setCompleted(true);
-    updateUser({ lastPrayerDate: new Date().toISOString() });
-    if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+    setShowParticles(true);
+    recordPrayer();
+    if (navigator.vibrate) navigator.vibrate([50, 100, 50, 100, 50]);
+    // Hide particles after animation
+    setTimeout(() => setShowParticles(false), 4000);
   };
 
+  const streak = getPrayerStreak();
   const ccParam = subtitles ? "&cc_load_policy=1" : "";
 
   return (
@@ -74,6 +68,36 @@ const VideoPlayer = ({ language, onBack }: VideoPlayerProps) => {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[100px]" />
         <div className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full bg-primary/3 blur-[80px]" />
       </motion.div>
+
+      {/* Completion golden particles */}
+      {showParticles && (
+        <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+          {[...Array(24)].map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{
+                x: "50vw",
+                y: "50vh",
+                scale: 0,
+                opacity: 1,
+              }}
+              animate={{
+                x: `${Math.random() * 100}vw`,
+                y: `${Math.random() * 100}vh`,
+                scale: [0, 1, 0.5],
+                opacity: [1, 0.8, 0],
+              }}
+              transition={{
+                duration: 2 + Math.random() * 2,
+                delay: Math.random() * 0.5,
+                ease: "easeOut",
+              }}
+              className="absolute w-2 h-2 rounded-full bg-primary"
+              style={{ filter: "blur(1px)", boxShadow: "0 0 8px hsl(var(--primary) / 0.6)" }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 relative z-10">
@@ -101,42 +125,111 @@ const VideoPlayer = ({ language, onBack }: VideoPlayerProps) => {
 
       {/* Video Container */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 relative z-10">
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {completed ? (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              key="completed"
+              initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col items-center text-center"
             >
+              {/* Golden glow behind */}
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-                className="w-24 h-24 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center mb-6 gold-glow"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: [0, 1.5, 1.2], opacity: [0, 0.3, 0.15] }}
+                transition={{ duration: 2, ease: "easeOut" }}
+                className="absolute w-64 h-64 rounded-full bg-primary/20 blur-[60px]"
+              />
+              
+              {/* Checkmark with ring animation */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 150, damping: 12, delay: 0.2 }}
+                className="relative mb-8"
               >
-                <Check className="w-12 h-12 text-primary" />
+                <div className="w-28 h-28 rounded-full bg-primary/15 border-2 border-primary/40 flex items-center justify-center gold-glow">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.6, type: "spring", stiffness: 300 }}
+                  >
+                    <Check className="w-14 h-14 text-primary" />
+                  </motion.div>
+                </div>
+                {/* Expanding ring */}
+                <motion.div
+                  initial={{ scale: 1, opacity: 0.5 }}
+                  animate={{ scale: 2, opacity: 0 }}
+                  transition={{ delay: 0.4, duration: 1.5, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-full border border-primary/30"
+                />
+                <motion.div
+                  initial={{ scale: 1, opacity: 0.3 }}
+                  animate={{ scale: 2.5, opacity: 0 }}
+                  transition={{ delay: 0.6, duration: 1.5, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-full border border-primary/20"
+                />
               </motion.div>
-              <h3 className="text-2xl font-display text-foreground gold-text-glow mb-2">
-                Prayer Completed
-              </h3>
-              <p className="text-muted-foreground text-sm mb-8">
-                Tonight's prayer has been offered. God bless you.
-              </p>
-              <button
+
+              <motion.h3
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="text-3xl font-display text-foreground gold-text-glow mb-3"
+              >
+                Prayer Complete
+              </motion.h3>
+              <motion.p
+                initial={{ y: 15, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1 }}
+                className="text-muted-foreground text-base mb-2 max-w-xs"
+              >
+                Thank you for joining tonight's prayer.
+              </motion.p>
+              <motion.p
+                initial={{ y: 15, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.2 }}
+                className="text-muted-foreground/60 text-sm font-display italic mb-8"
+              >
+                God bless you and keep you.
+              </motion.p>
+
+              {streak > 0 && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 1.5, type: "spring" }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 mb-8"
+                >
+                  <span className="text-lg">🔥</span>
+                  <span className="text-sm text-foreground font-medium">{streak} day streak</span>
+                </motion.div>
+              )}
+
+              <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.8 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onBack}
-                className="px-8 py-3 rounded-full bg-primary/10 border border-primary/30 text-primary font-medium transition-all hover:bg-primary/20"
+                className="px-10 py-3.5 rounded-full bg-primary/10 border border-primary/30 text-primary font-medium transition-all hover:bg-primary/20 gold-glow"
               >
                 Return Home
-              </button>
+              </motion.button>
             </motion.div>
           ) : (
             <motion.div
+              key="player"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
               className="w-full max-w-lg"
             >
-              {/* Loading skeleton */}
               {loading && (
                 <div className="absolute inset-0 flex items-center justify-center z-20">
                   <div className="w-full max-w-lg mx-4">
