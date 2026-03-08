@@ -54,7 +54,7 @@ const HomeDashboard = ({ onPlayPrayer, onSelectLanguage, onShare }: HomeDashboar
   };
   const item = {
     hidden: { opacity: 0, y: 25 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   return (
