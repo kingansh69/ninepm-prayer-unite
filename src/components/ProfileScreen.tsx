@@ -170,6 +170,8 @@ const ProfileScreen = ({ onSelectLanguage, onShare, onLogout }: ProfileScreenPro
           {user?.timezone}
         </p>
       </motion.div>
+
+      <InstallGuide open={showInstallGuide} onClose={() => setShowInstallGuide(false)} />
     </motion.div>
   );
 };
