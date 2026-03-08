@@ -1,20 +1,97 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Share2, Smartphone, Plus, ArrowUp } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 
 interface InstallGuideProps {
   open: boolean;
   onClose: () => void;
 }
 
-const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
+const iosSteps = [
+  {
+    title: "Tap the Share button",
+    description: "Find the share icon at the bottom of your Safari browser (the square with an arrow pointing up).",
+    icon: "share",
+  },
+  {
+    title: "Add to Home Screen",
+    description: 'Scroll down in the share menu and tap "Add to Home Screen".',
+    icon: "plus",
+  },
+  {
+    title: 'Tap "Add"',
+    description: 'Confirm by tapping "Add" in the top right corner. The app will appear on your home screen!',
+    icon: "phone",
+  },
+];
+
+const androidSteps = [
+  {
+    title: "Tap the menu",
+    description: "Tap the three dots (⋮) in the top right of your browser.",
+    icon: "menu",
+  },
+  {
+    title: "Install App or Add to Home Screen",
+    description: 'Look for "Install app" or "Add to Home screen" in the menu.',
+    icon: "plus",
+  },
+  {
+    title: "Confirm install",
+    description: 'Tap "Install" to add the app. It will appear on your home screen like a real app!',
+    icon: "phone",
+  },
+];
+
+const StepIcon = ({ type }: { type: string }) => {
+  switch (type) {
+    case "share": return <ArrowUp className="w-8 h-8 text-foreground" />;
+    case "plus": return <Plus className="w-4 h-4 text-foreground" />;
+    case "menu": return <span className="text-foreground text-2xl">⋮</span>;
+    default: return <span className="text-primary text-xl font-display">✝</span>;
+  }
+};
+
+const StepVisual = ({ type, step }: { type: string; step: number }) => {
+  if (step === 2) {
+    return (
+      <div className="flex items-center gap-3 mx-auto w-fit">
+        <div className="w-14 h-14 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center gold-glow">
+          <span className="text-primary text-xl font-display">✝</span>
+        </div>
+        <div>
+          <p className="text-sm text-foreground font-medium">9PM Prayer</p>
+          <p className="text-xs text-muted-foreground">On your home screen</p>
+        </div>
+      </div>
+    );
+  }
+  if (type === "plus") {
+    return (
+      <div className="glass-panel px-4 py-3 flex items-center gap-3 mx-auto max-w-[220px]">
+        <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center">
+          <Plus className="w-4 h-4 text-foreground" />
+        </div>
+        <span className="text-sm text-foreground">
+          {type === "plus" ? "Add to Home Screen" : "Install app"}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="w-16 h-16 rounded-2xl bg-secondary/80 flex items-center justify-center mx-auto">
+      <StepIcon type={type} />
+    </div>
+  );
+};
+
+const InstallGuide = forwardRef<HTMLDivElement, InstallGuideProps>(({ open, onClose }, ref) => {
   const [step, setStep] = useState(0);
   const [isIOS, setIsIOS] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
-    const ua = navigator.userAgent;
-    setIsIOS(/iPad|iPhone|iPod/.test(ua));
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -23,6 +100,10 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
+
+  useEffect(() => {
+    if (open) setStep(0);
+  }, [open]);
 
   const handleNativeInstall = async () => {
     if (deferredPrompt) {
@@ -35,93 +116,12 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
 
   if (!open) return null;
 
-  const iosSteps = [
-    {
-      icon: <Share2 className="w-8 h-8 text-primary" />,
-      title: "Tap the Share button",
-      description: "Find the share icon at the bottom of your Safari browser (the square with an arrow pointing up).",
-      visual: (
-        <div className="w-16 h-16 rounded-2xl bg-secondary/80 flex items-center justify-center mx-auto">
-          <ArrowUp className="w-8 h-8 text-foreground" />
-        </div>
-      ),
-    },
-    {
-      icon: <Plus className="w-8 h-8 text-primary" />,
-      title: "Add to Home Screen",
-      description: "Scroll down in the share menu and tap \"Add to Home Screen\".",
-      visual: (
-        <div className="glass-panel px-4 py-3 flex items-center gap-3 mx-auto max-w-[220px]">
-          <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center">
-            <Plus className="w-4 h-4 text-foreground" />
-          </div>
-          <span className="text-sm text-foreground">Add to Home Screen</span>
-        </div>
-      ),
-    },
-    {
-      icon: <Smartphone className="w-8 h-8 text-primary" />,
-      title: "Tap \"Add\"",
-      description: "Confirm by tapping \"Add\" in the top right corner. The app will appear on your home screen!",
-      visual: (
-        <div className="flex items-center gap-3 mx-auto">
-          <div className="w-14 h-14 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center gold-glow">
-            <span className="text-primary text-xl font-display">✝</span>
-          </div>
-          <div>
-            <p className="text-sm text-foreground font-medium">9PM Prayer</p>
-            <p className="text-xs text-muted-foreground">On your home screen</p>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
-  const androidSteps = [
-    {
-      icon: <Smartphone className="w-8 h-8 text-primary" />,
-      title: "Tap the menu",
-      description: "Tap the three dots (⋮) in the top right of your browser.",
-      visual: (
-        <div className="w-16 h-16 rounded-2xl bg-secondary/80 flex items-center justify-center mx-auto">
-          <span className="text-foreground text-2xl">⋮</span>
-        </div>
-      ),
-    },
-    {
-      icon: <Plus className="w-8 h-8 text-primary" />,
-      title: "Install App or Add to Home Screen",
-      description: "Look for \"Install app\" or \"Add to Home screen\" in the menu.",
-      visual: (
-        <div className="glass-panel px-4 py-3 flex items-center gap-3 mx-auto max-w-[240px]">
-          <Smartphone className="w-5 h-5 text-primary" />
-          <span className="text-sm text-foreground">Install app</span>
-        </div>
-      ),
-    },
-    {
-      icon: <Smartphone className="w-8 h-8 text-primary" />,
-      title: "Confirm install",
-      description: "Tap \"Install\" to add the app. It will appear on your home screen like a real app!",
-      visual: (
-        <div className="flex items-center gap-3 mx-auto">
-          <div className="w-14 h-14 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center gold-glow">
-            <span className="text-primary text-xl font-display">✝</span>
-          </div>
-          <div>
-            <p className="text-sm text-foreground font-medium">9PM Prayer</p>
-            <p className="text-xs text-muted-foreground">Installed</p>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
   const steps = isIOS ? iosSteps : androidSteps;
   const currentStep = steps[step];
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -135,7 +135,6 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
         className="relative w-full max-w-lg glass-panel rounded-b-none p-6 pb-10"
       >
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
@@ -143,7 +142,6 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
           <X className="w-5 h-5" />
         </button>
 
-        {/* Header */}
         <div className="text-center mb-6">
           <h3 className="text-xl font-display text-foreground gold-text-glow mb-1">
             Install the App
@@ -153,7 +151,6 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
           </p>
         </div>
 
-        {/* Native install button if available */}
         {deferredPrompt && (
           <motion.button
             whileTap={{ scale: 0.98 }}
@@ -164,7 +161,6 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
           </motion.button>
         )}
 
-        {/* Step progress */}
         <div className="flex justify-center gap-2 mb-6">
           {steps.map((_, i) => (
             <div
@@ -176,7 +172,6 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
           ))}
         </div>
 
-        {/* Step content */}
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -186,14 +181,12 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            {/* Visual */}
-            <div className="mb-6">{currentStep.visual}</div>
-
-            {/* Step number */}
+            <div className="mb-6">
+              <StepVisual type={currentStep.icon} step={step} />
+            </div>
             <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-3">
               <span className="text-sm text-primary font-semibold">{step + 1}</span>
             </div>
-
             <h4 className="text-lg font-display text-foreground mb-2">{currentStep.title}</h4>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
               {currentStep.description}
@@ -201,7 +194,6 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation */}
         <div className="flex gap-3 mt-8">
           {step > 0 && (
             <button
@@ -213,11 +205,8 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
           )}
           <button
             onClick={() => {
-              if (step < steps.length - 1) {
-                setStep(step + 1);
-              } else {
-                onClose();
-              }
+              if (step < steps.length - 1) setStep(step + 1);
+              else onClose();
             }}
             className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm transition-all gold-glow"
           >
@@ -227,6 +216,8 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
       </motion.div>
     </motion.div>
   );
-};
+});
+
+InstallGuide.displayName = "InstallGuide";
 
 export default InstallGuide;
