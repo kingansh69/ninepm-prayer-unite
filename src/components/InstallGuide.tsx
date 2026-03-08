@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Share2, Smartphone, Plus, ArrowUp } from "lucide-react";
-import { useState, useEffect, forwardRef } from "react";
+import { useState, useEffect } from "react";
 
 interface InstallGuideProps {
   open: boolean;
