@@ -132,7 +132,7 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="relative w-full max-w-lg glass-panel rounded-b-none p-6 pb-10"
+        className="relative w-full max-w-lg glass-panel rounded-b-none p-6 pb-24"
       >
         <button
           onClick={onClose}
