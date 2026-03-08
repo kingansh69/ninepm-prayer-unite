@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { User, Globe, Bell, Share2, ExternalLink, Info, LogOut, Download } from "lucide-react";
-import { getUser, updateUser, clearUser } from "@/lib/storage";
+import { User, Globe, Bell, Share2, Info, LogOut, Download, Smartphone } from "lucide-react";
+import { getUser, updateUser, getPrayerStreak, prayedToday } from "@/lib/storage";
 import { getLanguageByCode } from "@/lib/languages";
 import { useState, useEffect } from "react";
+import InstallGuide from "./InstallGuide";
 
 interface ProfileScreenProps {
   onSelectLanguage: () => void;
