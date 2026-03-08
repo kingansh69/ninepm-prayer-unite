@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Share2, Smartphone, Plus, ArrowUp } from "lucide-react";
-import { useState, useEffect, forwardRef } from "react";
+import { useState, useEffect } from "react";
 
 interface InstallGuideProps {
   open: boolean;
@@ -85,7 +85,7 @@ const StepVisual = ({ type, step }: { type: string; step: number }) => {
   );
 };
 
-const InstallGuide = forwardRef<HTMLDivElement, InstallGuideProps>(({ open, onClose }, ref) => {
+const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
   const [step, setStep] = useState(0);
   const [isIOS, setIsIOS] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -121,7 +121,6 @@ const InstallGuide = forwardRef<HTMLDivElement, InstallGuideProps>(({ open, onCl
 
   return (
     <motion.div
-      ref={ref}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -216,8 +215,6 @@ const InstallGuide = forwardRef<HTMLDivElement, InstallGuideProps>(({ open, onCl
       </motion.div>
     </motion.div>
   );
-});
-
-InstallGuide.displayName = "InstallGuide";
+};
 
 export default InstallGuide;
