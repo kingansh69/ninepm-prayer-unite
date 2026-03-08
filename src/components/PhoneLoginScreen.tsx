@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { Phone, ChevronDown, Check, ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { createUser, getUser } from "@/lib/storage";
+import heroCross from "@/assets/hero-cross.png";
 
 const countryCodes = [
   { code: "+1", country: "US", flag: "🇺🇸" },
@@ -39,8 +40,6 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
   const handleContinue = async () => {
     if (phone.length < 6) return;
     setLoading(true);
-    
-    // Simulate brief loading
     await new Promise((r) => setTimeout(r, 800));
     
     const existing = getUser();
@@ -52,7 +51,6 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
     
     setLoading(false);
     setSuccess(true);
-    
     setTimeout(() => onComplete(), 1500);
   };
 
@@ -64,19 +62,20 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
         exit={{ opacity: 0 }}
         className="min-h-screen flex flex-col items-center justify-center px-6 relative z-10"
       >
+        <div className="absolute inset-0 bg-gradient-radial-gold pointer-events-none" />
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          className="w-20 h-20 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center gold-glow mb-6"
+          className="w-24 h-24 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center gold-glow-strong mb-6 relative z-10"
         >
-          <Check className="w-10 h-10 text-primary" />
+          <Check className="w-12 h-12 text-primary" />
         </motion.div>
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-2xl font-display text-foreground gold-text-glow"
+          className="text-3xl font-display text-gradient-gold relative z-10"
         >
           Welcome to Prayer
         </motion.p>
@@ -84,7 +83,7 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="text-sm text-muted-foreground mt-2"
+          className="text-sm text-muted-foreground mt-2 relative z-10"
         >
           Your account has been created
         </motion.p>
@@ -102,7 +101,7 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={onBack}
-        className="self-start p-2 rounded-full bg-secondary/50 text-foreground/70 hover:text-foreground transition-colors mb-8"
+        className="self-start p-2.5 rounded-full bg-secondary/50 backdrop-blur-sm text-foreground/70 hover:text-foreground transition-colors mb-8"
       >
         <ArrowLeft className="w-5 h-5" />
       </motion.button>
@@ -113,14 +112,19 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
         transition={{ delay: 0.2 }}
         className="flex-1 flex flex-col"
       >
-        <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mb-6 gold-glow">
-          <Phone className="w-6 h-6 text-primary" />
-        </div>
+        <motion.img
+          src={heroCross}
+          alt=""
+          className="w-16 h-16 object-contain mb-6 opacity-70"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3, type: "spring" }}
+        />
 
-        <h2 className="text-3xl font-display font-light text-foreground gold-text-glow mb-2">
+        <h2 className="text-3xl font-display font-light text-gradient-gold mb-2">
           Your Phone Number
         </h2>
-        <p className="text-muted-foreground text-sm mb-8">
+        <p className="text-muted-foreground/70 text-sm mb-8">
           Enter your phone number to create your prayer account. No verification needed.
         </p>
 
@@ -129,7 +133,7 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
           <div className="relative">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="glass-panel px-4 py-4 flex items-center gap-2 text-foreground hover:border-primary/30 transition-colors min-w-[100px]"
+              className="glass-panel-elevated px-4 py-4 flex items-center gap-2 text-foreground min-w-[100px]"
             >
               <span className="text-lg">{selectedCode.flag}</span>
               <span className="text-sm">{selectedCode.code}</span>
@@ -138,9 +142,9 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
 
             {showDropdown && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute top-full left-0 right-0 mt-2 glass-panel p-2 max-h-60 overflow-y-auto z-50 min-w-[200px]"
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="absolute top-full left-0 right-0 mt-2 glass-panel-elevated p-2 max-h-60 overflow-y-auto z-50 min-w-[200px]"
               >
                 {countryCodes.map((cc) => (
                   <button
@@ -149,11 +153,11 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
                       setSelectedCode(cc);
                       setShowDropdown(false);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent text-sm text-foreground transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-sm text-foreground transition-colors"
                   >
                     <span>{cc.flag}</span>
                     <span>{cc.country}</span>
-                    <span className="text-muted-foreground ml-auto">{cc.code}</span>
+                    <span className="text-muted-foreground/60 ml-auto">{cc.code}</span>
                   </button>
                 ))}
               </motion.div>
@@ -165,11 +169,11 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
             value={phone}
             onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
             placeholder="Phone number"
-            className="flex-1 glass-panel px-4 py-4 bg-transparent text-foreground placeholder:text-muted-foreground/50 text-lg tracking-wider focus:outline-none focus:border-primary/40 transition-colors"
+            className="flex-1 glass-panel-elevated px-4 py-4 bg-transparent text-foreground placeholder:text-muted-foreground/30 text-lg tracking-wider focus:outline-none focus:border-primary/40 transition-colors"
           />
         </div>
 
-        <p className="text-xs text-muted-foreground/60 mb-8">
+        <p className="text-[10px] text-muted-foreground/40 mb-10 tracking-wide">
           Your phone number is used as your unique ID. No SMS will be sent.
         </p>
 
@@ -178,16 +182,16 @@ const PhoneLoginScreen = ({ onComplete, onBack }: PhoneLoginScreenProps) => {
           whileTap={{ scale: 0.98 }}
           onClick={handleContinue}
           disabled={phone.length < 6 || loading}
-          className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-medium text-lg tracking-wide transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed gold-glow relative overflow-hidden"
+          className="w-full py-4 rounded-2xl btn-premium text-primary-foreground font-semibold text-lg tracking-wide gold-glow-strong disabled:opacity-30 disabled:cursor-not-allowed relative overflow-hidden"
         >
           {loading ? (
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-6 h-6 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full mx-auto"
+              className="w-6 h-6 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full mx-auto relative z-10"
             />
           ) : (
-            "Continue"
+            <span className="relative z-10">Continue</span>
           )}
         </motion.button>
       </motion.div>
