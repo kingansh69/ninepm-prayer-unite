@@ -85,7 +85,7 @@ const StepVisual = ({ type, step }: { type: string; step: number }) => {
   );
 };
 
-const InstallGuide = forwardRef<HTMLDivElement, InstallGuideProps>(({ open, onClose }, ref) => {
+const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
   const [step, setStep] = useState(0);
   const [isIOS, setIsIOS] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
