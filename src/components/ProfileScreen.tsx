@@ -15,7 +15,10 @@ const ProfileScreen = ({ onSelectLanguage, onShare, onLogout }: ProfileScreenPro
   const user = getUser();
   const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
   const selectedLang = user?.selectedLanguage ? getLanguageByCode(user.selectedLanguage) : null;
+  const streak = getPrayerStreak();
+  const didPrayToday = prayedToday();
 
   useEffect(() => {
     const handler = (e: Event) => {
