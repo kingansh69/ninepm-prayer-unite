@@ -131,20 +131,18 @@ const ProfileScreen = ({ onSelectLanguage, onShare, onLogout }: ProfileScreenPro
           </div>
         </motion.button>
 
-        {deferredPrompt && (
-          <motion.button
-            variants={item}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleInstall}
-            className="w-full glass-panel p-4 flex items-center gap-4 hover:border-primary/30 transition-colors"
-          >
-            <Download className="w-5 h-5 text-primary shrink-0" />
-            <div className="text-left">
-              <p className="text-sm text-foreground">Install App</p>
-              <p className="text-xs text-muted-foreground">Add to home screen</p>
-            </div>
-          </motion.button>
-        )}
+        <motion.button
+          variants={item}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setShowInstallGuide(true)}
+          className="w-full glass-panel p-4 flex items-center gap-4 hover:border-primary/30 transition-colors"
+        >
+          <Smartphone className="w-5 h-5 text-primary shrink-0" />
+          <div className="text-left">
+            <p className="text-sm text-foreground">Install App</p>
+            <p className="text-xs text-muted-foreground">Add to your home screen</p>
+          </div>
+        </motion.button>
 
         <motion.div variants={item} className="glass-panel p-4 flex items-start gap-4">
           <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
