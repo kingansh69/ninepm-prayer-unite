@@ -12,8 +12,8 @@ import ProfileScreen from "@/components/ProfileScreen";
 import BottomNav from "@/components/BottomNav";
 import type { Tab } from "@/components/BottomNav";
 import type { Language } from "@/lib/languages";
-import { getUser, updateUser, clearUser, getLanguageByCode } from "@/lib/storage";
-import { getLanguageByCode as getLang } from "@/lib/languages";
+import { getUser, updateUser, clearUser } from "@/lib/storage";
+import { getLanguageByCode } from "@/lib/languages";
 
 type AppScreen = "splash" | "phone" | "onboarding" | "main" | "player";
 
