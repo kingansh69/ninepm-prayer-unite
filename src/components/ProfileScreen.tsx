@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { User, Globe, Bell, Share2, ExternalLink, Info, LogOut, Download } from "lucide-react";
-import { getUser, updateUser, clearUser } from "@/lib/storage";
+import { User, Globe, Bell, Share2, Info, LogOut, Download, Smartphone } from "lucide-react";
+import { getUser, updateUser, getPrayerStreak, prayedToday } from "@/lib/storage";
 import { getLanguageByCode } from "@/lib/languages";
 import { useState, useEffect } from "react";
+import InstallGuide from "./InstallGuide";
 
 interface ProfileScreenProps {
   onSelectLanguage: () => void;
@@ -14,7 +15,10 @@ const ProfileScreen = ({ onSelectLanguage, onShare, onLogout }: ProfileScreenPro
   const user = getUser();
   const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
   const selectedLang = user?.selectedLanguage ? getLanguageByCode(user.selectedLanguage) : null;
+  const streak = getPrayerStreak();
+  const didPrayToday = prayedToday();
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -127,20 +131,18 @@ const ProfileScreen = ({ onSelectLanguage, onShare, onLogout }: ProfileScreenPro
           </div>
         </motion.button>
 
-        {deferredPrompt && (
-          <motion.button
-            variants={item}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleInstall}
-            className="w-full glass-panel p-4 flex items-center gap-4 hover:border-primary/30 transition-colors"
-          >
-            <Download className="w-5 h-5 text-primary shrink-0" />
-            <div className="text-left">
-              <p className="text-sm text-foreground">Install App</p>
-              <p className="text-xs text-muted-foreground">Add to home screen</p>
-            </div>
-          </motion.button>
-        )}
+        <motion.button
+          variants={item}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setShowInstallGuide(true)}
+          className="w-full glass-panel p-4 flex items-center gap-4 hover:border-primary/30 transition-colors"
+        >
+          <Smartphone className="w-5 h-5 text-primary shrink-0" />
+          <div className="text-left">
+            <p className="text-sm text-foreground">Install App</p>
+            <p className="text-xs text-muted-foreground">Add to your home screen</p>
+          </div>
+        </motion.button>
 
         <motion.div variants={item} className="glass-panel p-4 flex items-start gap-4">
           <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
@@ -168,6 +170,8 @@ const ProfileScreen = ({ onSelectLanguage, onShare, onLogout }: ProfileScreenPro
           {user?.timezone}
         </p>
       </motion.div>
+
+      <InstallGuide open={showInstallGuide} onClose={() => setShowInstallGuide(false)} />
     </motion.div>
   );
 };
