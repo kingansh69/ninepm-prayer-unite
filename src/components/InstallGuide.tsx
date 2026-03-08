@@ -215,8 +215,6 @@ const InstallGuide = ({ open, onClose }: InstallGuideProps) => {
       </motion.div>
     </motion.div>
   );
-});
-
-InstallGuide.displayName = "InstallGuide";
+};
 
 export default InstallGuide;
